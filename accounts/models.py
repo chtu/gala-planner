@@ -40,7 +40,7 @@ class UserManager(BaseUserManager):
 		if not email:
 			raise ValueError('The given email must be set')
 		email = self.normalize_email(email)
-		superuser = self.model(email=email, first_name=first_name, last_name=last_name, is_staff=True)
+		superuser = self.model(email=email, first_name=first_name, last_name=last_name, is_admin=True)
 		superuser.set_password(password)
 		superuser.save(using=self._db)
 		return superuser
@@ -56,11 +56,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 	email = models.EmailField(_('email address'), unique=True)
 	first_name = models.CharField(_('first name'), max_length=50, blank=False)
 	last_name = models.CharField(_('last name'), max_length=50, blank=False)
-	company_name = models.CharField(_('company'), max_length=100, blank=True)
-	date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
+	company_name = models.CharField(_('company'), max_length=200, blank=True)
+	date_joined = models.DateTimeField(_('date joined'), auto_now_add=True, auto_now=False)
 	is_active = models.BooleanField(_('active'), default=True)
 	is_planner = models.BooleanField(_('planner'), default=False)
-	is_staff = models.BooleanField(_('staff'), default=False)
+	is_admin = models.BooleanField(_('admin'), default=False)
 
 	objects = UserManager()
 
@@ -80,6 +80,26 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 	def email_user(self, subject, message, from_email=None):
 		send_mail(subject, message, from_email, [self.email])
+
+	def is_staff(self):
+		"Is the user a member of staff?"
+		# Simplest possible answer: All admins are staff
+		return self.is_admin
+
+	#Setting individual permissions for Django admin
+	def has_perm(self, can_edit, obj=None):
+		if self.is_admin:
+			return True
+	def has_perm(self, can_view, obj=None):
+		if self.is_admin:
+			return True
+
+	def has_module_perms(self, accounts):
+		if self.is_admin:
+			return True
+	def has_module_perms(self, tablesetter):
+		if self.is_admin:
+			return True
 
 	def __str__(self):
 		full_name = '%s %s' % (self.first_name, self.last_name)
