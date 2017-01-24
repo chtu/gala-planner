@@ -13,7 +13,7 @@ class UserManager(BaseUserManager):
 		email = self.normalize_email(email)
 		user = self.model(email=email, first_name=first_name, last_name=last_name, is_admin=is_admin)
 		user.set_password(password)
-		user.save(using=self.db)
+		user.save(using=self._db)
 		return user
 
 	def create_user(self, email, password, first_name, last_name, is_admin, **extra_fields):

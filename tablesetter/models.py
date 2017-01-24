@@ -1,27 +1,11 @@
 from django.db import models
-from accounts.models import User
 from django.core.validators import MaxValueValidator
 
+from accounts.models import User
+from galasetter.models import Gala, MealChoice
 
-class Gala(models.Model):
-	gala_name = models.CharField('event name', max_length=100, blank=False)
-	gala_datetime = models.DateTimeField('event date', blank=False)
-	gala_num_tables = models.IntegerField('number of tables',)
-	gala_total_guests = models.IntegerField('maximum number of guests',)
-	date_created = models.DateTimeField('date created', auto_now_add=True, auto_now=False, null=True)
-	date_updated = models.DateTimeField('date updated', auto_now_add=False, auto_now=True, null=True)
 
-	def __str__(self):
-		return gala_name
-
-class MealChoice(models.Model):
-	gala = models.ForeignKey(Gala, on_delete=models.CASCADE)
-	choice_name = models.CharField('meal choice', max_length=200)
-
-	def __str__(self):
-		return self.choice_name
-
-#In this class, our 'user' is basically a table sponsor who buys the table at the gala
+#In class Table, our 'user' is basically a table sponsor who buys the table at the gala
 class Table(models.Model):
 	gala = models.ForeignKey(Gala, on_delete=models.CASCADE)
 	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)

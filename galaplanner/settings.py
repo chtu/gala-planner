@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     #my apps
     "accounts",
     "tablesetter",
+    "galasetter",
 ]
 
 MIDDLEWARE = [
