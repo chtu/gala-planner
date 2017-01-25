@@ -2,10 +2,10 @@ from django.db import models
 from django.utils import timezone
 import datetime
 
-
 class Gala(models.Model):
 	gala_name = models.CharField('event name', max_length=100, blank=False)
-	gala_datetime = models.DateTimeField('event date', null=True)
+	gala_date = models.DateField('event date', null=True)
+	gala_time = models.TimeField('event time', null=True)
 	gala_num_tables = models.IntegerField('number of tables', default=0)
 	gala_num_confirmed = models.IntegerField('number of confirmed guests', default=0)
 	gala_num_invited = models.IntegerField('number of invited guests', default=0)
@@ -17,27 +17,38 @@ class Gala(models.Model):
 	def __str__(self):
 		return self.gala_name
 
-	def set_gala_datetime(self, year, month, day, hour, minute):
-		try:
-			t = timezone.now()
-
-			if year >= t.year and year < 2099:
-				self.gala_datetime = datetime.datetime(year, month, day, hour, minute, 0)
-			else:
-				raise ValueError("The year doesn't sound right!")
-		except ValueError:
-			raise ValueError("Some of the values are not valid")
-
 	def gala_has_happened(self):
-		if self.gala_datetime == None:
+		if self.gala_date == None or self.gala_time == None:
 			return False
 
 		d = timezone.now()
 		current_datetime = datetime.datetime(d.year, d.month, d.day, d.hour, d.minute, 0)
-		if self.gala_datetime < current_datetime:
+
+		year, month, day = self.gala_date.split("-")
+		hour, minute = self.gala_time.split(":")
+
+		gala_datetime = datetime.datetime(
+			int(year),
+			int(month),
+			int(day),
+			int(hour),
+			int(minute),
+			0
+		)
+
+		if gala_datetime < current_datetime:
 			return True
 		else:
 			return False
+
+	def date_as_str(self):
+		months_list = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+			'October', 'November', 'December']
+		year, month, day = self.gala_date.split("-")
+		str_month = months_list[int(month)-1]
+
+		return "%s %s, %s" % (str_month, int(day), year)
+
 
 class MealChoice(models.Model):
 	gala = models.ForeignKey(Gala, on_delete=models.CASCADE)
