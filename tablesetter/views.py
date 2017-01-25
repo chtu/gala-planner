@@ -5,9 +5,9 @@ from tablesetter.models import Gala
 def home(request):
 	gala = Gala.objects.create(
 		gala_name="My new gala",
+		gala_date="1987-11-09",
+		gala_time="5:50",
 	)
-
-	gala.set_gala_datetime(2016, 11, 9, 8, 23)
 
 	context = {
 		'gala': gala,
