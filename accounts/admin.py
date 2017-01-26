@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
-from .models import User
+from .models import User, UserManager
 
 class UserCreationForm(forms.ModelForm):
 	password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
@@ -14,15 +14,24 @@ class UserCreationForm(forms.ModelForm):
 		model = User
 		fields = ('email', 'first_name', 'last_name')
 
-	def clean_password(self):
-		password1 = forms.cleaned_data.get('password1')
-		password2 = forms.cleaned_data.get('password2')
+	def clean_password2(self):
+		password1 = self.cleaned_data.get('password1')
+		password2 = self.cleaned_data.get('password2')
 		if password1 and password2 and password1 != password2:
 			raise forms.ValidationError("Passwords do not match")
 		return password2
 
+#Start here, cleaning email
+	def clean_email(self):
+		email = self.cleaned_data.get('email')
+		user_manager = UserManager()
+		user.email = user_manager.normalize_email(user.email)
+
+
 	def save(self, commit=True):
 		user = super(UserCreationForm, self).save(commit=False)
+		user.first_name = user.first_name.upper()
+		user.last_name = user.last_name.upper()
 
 		user.set_password(self.cleaned_data["password1"])
 		if commit:
@@ -43,7 +52,7 @@ class UserAdmin(BaseUserAdmin):
 	form = UserChangeForm
 	add_form = UserCreationForm
 
-	list_display = ('__str__', 'last_name', 'first_name')
+	list_display = ('email', 'last_name', 'first_name')
 	list_filter = ('is_admin','is_planner', 'email')
 	fieldsets = (
 		(None, {'fields': ('email', 'password',)}),

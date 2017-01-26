@@ -1,5 +1,10 @@
+{% if not first_name %}
 <h3>Hello world!</h3>
-<form action="{% url 'accounts:signed_up' %}" method="POST">{% csrf_token %}
+<form action="" method="POST">{% csrf_token %}
 	{{ form.as_p }}
 	<input type="submit" value="Sign Up" />
 </form>
+{% else %}
+You signed up, {{ first_name }}
+<a href="{% url 'accounts:planner_signup_form' %}">Click here to sign up again</a>
+{% endif %}

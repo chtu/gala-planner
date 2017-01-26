@@ -6,10 +6,21 @@ from accounts.models import User
 
 
 def planner_signup_form(request):
-	form = UserCreationForm()
+	form = UserCreationForm(request.POST or None)
 	context = {
 		'form': form,
 	}
+
+	if form.is_valid():
+		instance = form.save(commit=False)
+
+		first_name = instance.first_name
+		instance.save()
+
+		context = {
+			'first_name': first_name,
+		}
+
 
 	return render(request, "accounts/planner_signup_form.html", context)
 
@@ -18,16 +29,12 @@ def signed_up(request):
 
 	if form.is_valid():
 		instance = form.save(commit=False)
-		email = instance.email
-
-		
 
 		first_name = instance.first_name
 		instance.save()
 
 		context = {
 			'first_name': first_name,
-			'email': email,
 		}
 
 	context = {}
