@@ -55,6 +55,16 @@ class MealChoice(models.Model):
 	choice_text = models.CharField('meal choice', max_length=200)
 	num_selected = models.IntegerField('number of times selected', default=0)
 
+	def incrementChoice(self):
+		self.num_selected += 1
+		return True
+
+	def decrementChoice(self):
+		if self.num_selected > 0:
+			self.num_selected -= 1
+			return True
+		else:
+			return False
 
 	def __str__(self):
 		return self.choice_name

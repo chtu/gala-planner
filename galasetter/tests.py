@@ -53,3 +53,4 @@ class GalaMethodTests(TestCase):
 		invalid_time = "27:34"
 		with self.assertRaises(ValidationError):
 			Gala.objects.create(gala_name=gala_name, gala_date=invalid_time)
+

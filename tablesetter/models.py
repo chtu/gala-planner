@@ -33,10 +33,15 @@ class Seat(models.Model):
 
 class SeatDetails(models.Model):
 	seat = models.OneToOneField(Seat)
-	guest_first_name = models.CharField(max_length=50, blank=False)
-	guest_last_name = models.CharField(max_length=50, blank=False)
+	guest_first_name = models.CharField("guest's first name", max_length=50, blank=False)
+	guest_last_name = models.CharField("guest's last name", max_length=50, blank=False)
 	meal_choice = models.CharField('meal choice', max_length=200, blank=False)
 	dietary_restrictions = models.CharField('dietary restrictions', max_length=300, blank=True)
-	special_accommodations = models.CharField(max_length=300, blank=True)
-	initial_response_date = models.DateTimeField(auto_now_add=True, auto_now=False, null=True)
-	date_updated = models.DateTimeField(auto_now_add=False, auto_now=True, null=True)
+	special_accommodations = models.CharField("special accommodations", max_length=300, blank=True)
+	initial_response_date = models.DateTimeField("initial response date", auto_now_add=True, auto_now=False, null=True)
+	date_updated = models.DateTimeField("date updated", auto_now_add=False, auto_now=True, null=True)
+
+
+
+
+
