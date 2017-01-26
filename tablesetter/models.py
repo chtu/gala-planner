@@ -15,13 +15,13 @@ class Table(models.Model):
 	date_updated = models.DateTimeField(auto_now_add=False, auto_now=True, null=True)
 
 	def __str__(self):
-		return table_sponsor
+		return self.table_sponsor
 
 
 class Seat(models.Model):
 	table = models.ForeignKey(Table, on_delete=models.CASCADE)
 	invite_is_pending = models.BooleanField(default=False)
-	last_invite_sent_datetime = models.BooleanField(null=True)
+	last_invite_sent_datetime = models.DateTimeField(null=True)
 	details_completed = models.BooleanField(default=True)
 	is_donated = models.BooleanField(default=False)
 

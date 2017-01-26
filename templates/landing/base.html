@@ -1,0 +1,6 @@
+<h3>Create an account here!</h3>
+
+<form action="" method="POST">{% csrf_token %}
+	{{ planner_signup_form.as_p }}
+	<input type="submit" value="Sign Up" />
+</form>
