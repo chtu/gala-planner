@@ -17,25 +17,20 @@ class Table(models.Model):
 	def __str__(self):
 		return table_sponsor
 
-class Party(models.Model):
-	table = models.ForeignKey(Table, on_delete=models.CASCADE)
-	party_contact = models.CharField('full name of party contact', max_length=150)
-
-	def __str__(self):
-		return self.party_contact
 
 class Seat(models.Model):
 	table = models.ForeignKey(Table, on_delete=models.CASCADE)
-	party = models.ForeignKey(Party, on_delete=models.CASCADE, null=True)
-	details_completed = models.BooleanField(default=False)
+	invite_is_pending = models.BooleanField(default=False)
+	last_invite_sent_datetime = models.BooleanField(null=True)
+	details_completed = models.BooleanField(default=True)
 	is_donated = models.BooleanField(default=False)
-	seat_number = models.IntegerField('seat number')
+
 
 class SeatDetails(models.Model):
 	seat = models.OneToOneField(Seat)
 	guest_first_name = models.CharField("guest's first name", max_length=50, blank=False)
 	guest_last_name = models.CharField("guest's last name", max_length=50, blank=False)
-	meal_choice = models.CharField('meal choice', max_length=200, blank=False)
+	meal_choice = models.CharField('meal choice', max_length=300, blank=False)
 	dietary_restrictions = models.CharField('dietary restrictions', max_length=300, blank=True)
 	special_accommodations = models.CharField("special accommodations", max_length=300, blank=True)
 	initial_response_date = models.DateTimeField("initial response date", auto_now_add=True, auto_now=False, null=True)
