@@ -21,12 +21,9 @@ class UserCreationForm(forms.ModelForm):
 			raise forms.ValidationError("Passwords do not match")
 		return password2
 
-#Start here, cleaning email
 	def clean_email(self):
 		email = self.cleaned_data.get('email')
-		user_manager = UserManager()
-		user.email = user_manager.normalize_email(user.email)
-
+		return email.lower()
 
 	def save(self, commit=True):
 		user = super(UserCreationForm, self).save(commit=False)
