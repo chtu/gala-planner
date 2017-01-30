@@ -1,7 +1,9 @@
+from django.contrib.auth import logout
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 
-from .forms import PlannerSignupForm
-from accounts.admin import UserCreationForm
+from accounts.forms import UserCreationForm
 from accounts.models import User
 
 
@@ -15,6 +17,7 @@ def planner_signup_form(request):
 		instance = form.save(commit=False)
 
 		first_name = instance.first_name
+		instance.is_planner = True
 		instance.save()
 
 		context = {
@@ -40,3 +43,8 @@ def signed_up(request):
 	context = {}
 
 	return render(request, "accounts/signed_up.html", context)
+
+def logout_view(request):
+	logout(request)
+
+	return HttpResponseRedirect(reverse('homepage:home'))

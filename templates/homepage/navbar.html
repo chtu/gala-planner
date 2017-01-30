@@ -1,0 +1,17 @@
+<table>
+	<tr>
+		<td>
+			<a href="{% url 'homepage:home' %}">Home</a>
+		</td>
+		<td>
+			{% if user.is_planner %}
+			<a href="{% url 'galasetter:gala_index' %}">Your Galas</a>
+			{% else %}
+			<a href="">Your Tables</a>
+			{% endif %}
+		</td>
+		<td>
+			<a href="{% url 'accounts:logout' %}">Log out</a>
+		</td>
+	</tr>
+</table>

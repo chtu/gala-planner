@@ -1,9 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Sign Up</title>
+		<!-- Stylesheet reference here -->
+	</head>
+	<body>
+		<!-- Navbar here -->
+		{% if user.is_authenticated %}
+		{% include 'homepage/navbar.html' %}
+		{% endif %}
+	</body>
+
+	<!-- JS reference here -->
+</html>
+
 {% if not first_name %}
+
+
 <h3>Hello world!</h3>
 <form action="" method="POST">{% csrf_token %}
 	{{ form.as_p }}
 	<input type="submit" value="Sign Up" />
 </form>
+<p>Already have an account?<br />
+<a href="{% url 'homepage:home' %}">Sign in here</a></p>
 {% else %}
 You signed up, {{ first_name }}
 <a href="{% url 'accounts:planner_signup_form' %}">Click here to sign up again</a>

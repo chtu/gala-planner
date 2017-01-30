@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     "accounts",
     "tablesetter",
     "galasetter",
-    "landing",
+    "homepage",
 ]
 
 MIDDLEWARE = [

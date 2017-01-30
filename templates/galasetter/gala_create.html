@@ -1,0 +1,9 @@
+{% extends 'galasetter/gala_index.html' %}
+
+{% block content %}
+<h2>Create Gala</h2>
+<form action="{% url 'galasetter:create' %}" method="POST">{% csrf_token %}
+	{{ form.as_p }}
+	<input type="submit" value="Create Gala" />
+</form>
+{% endblock %}

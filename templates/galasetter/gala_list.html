@@ -1,0 +1,20 @@
+{% extends 'galasetter/gala_index.html' %}
+
+{% block content %}
+<table>
+	<tr>
+		<td><a href="{% url 'galasetter:create' %}">Create new gala</a></td>
+	</tr>
+	{% if galas %}
+	{% for gala in galas %}
+	<tr>
+		<td>{{ gala.gala_name }}</td>
+		<td>{{ gala.gala_date }}</td>
+		<td>{{ gala.gala_time }}</td>
+		<td><a href="{% url 'galasetter:update' gala.id %}">Update</a></td>
+	</tr>
+	{% endfor %}
+	{% endif %}
+</table>
+
+{% endblock %}

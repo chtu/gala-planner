@@ -1,0 +1,32 @@
+{% extends 'galasetter/gala_index.html' %}
+
+{% block content %}
+{% if gala %}
+<p>Updating following gala: {{ gala }}</p>
+<form action="{% url 'galasetter:update' gala.id %}" method="POST">{% csrf_token %}
+	<table>
+		<tr>
+			<td>Name:</td>
+			<td>{{ gala.gala_name }}</td>
+			<td>{{ form.gala_name }}</td>
+			<td>{{ form.gala_name.errors.as_text }}
+		</tr>
+		<tr>
+			<td>Date:</td>
+			<td>{{ gala.gala_date }}</td>
+			<td>{{ form.gala_date }}</td>
+			<td>{{ form.gala_date.errors.as_text }}
+		</tr>
+		<tr>
+			<td>Time:</td>
+			<td>{{ gala.gala_time }}</td>
+			<td>{{ form.gala_time }}</td>
+			<td>{{ form.gala_time.errors.as_text }}
+		</tr>
+	</table>
+	<input type="submit" value="Update" />
+</form>
+{% else %}
+Uh oh! It looks like you can't access this gala.
+{% endif %}
+{% endblock %}

@@ -2,7 +2,10 @@ from django.db import models
 from django.utils import timezone
 import datetime
 
+from accounts.models import User
+
 class Gala(models.Model):
+	user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 	gala_name = models.CharField('event name', max_length=100, blank=False)
 	gala_date = models.DateField('event date', null=True)
 	gala_time = models.TimeField('event time', null=True)
