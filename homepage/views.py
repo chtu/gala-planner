@@ -15,9 +15,11 @@ def home(request):
 		}
 	else:
 		form = UserSigninForm(request.POST or None)
+		message = "Sign into your account:"
 
 		context = {
 			'form': form,
+			'message': message,
 		}
 
 		if request.POST:
@@ -27,5 +29,11 @@ def home(request):
 
 			if user is not None:
 				login(request, user)
+			else:
+				message = "The email/password combination was incorrect."
+				context = {
+					'form': form,
+					'message': message,
+				}
 
 	return render(request, 'homepage/base.html', context)

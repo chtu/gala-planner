@@ -3,18 +3,17 @@
 {% block content %}
 <table>
 	<tr>
-		<td><a href="{% url 'galasetter:create' %}">Create new gala</a></td>
+		<td>{{ gala_message }}</td>
 	</tr>
-	{% if galas %}
+	<tr>
+		<td><a href="{% url 'galasetter:create' %}"><strong>Create new gala</strong></a></td>
+	</tr>
 	{% for gala in galas %}
 	<tr>
-		<td>{{ gala.gala_name }}</td>
+		<td><a href="{% url 'galasetter:details' gala.id %}">{{ gala.gala_name }}</a></td>
 		<td>{{ gala.gala_date }}</td>
 		<td>{{ gala.gala_time }}</td>
-		<td><a href="{% url 'galasetter:update' gala.id %}">Update</a></td>
 	</tr>
 	{% endfor %}
-	{% endif %}
 </table>
-
 {% endblock %}

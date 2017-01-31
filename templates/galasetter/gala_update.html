@@ -1,6 +1,7 @@
 {% extends 'galasetter/gala_index.html' %}
 
 {% block content %}
+{% include 'galasetter/gala_navbar.html' %}
 {% if gala %}
 <p>Updating following gala: {{ gala }}</p>
 <form action="{% url 'galasetter:update' gala.id %}" method="POST">{% csrf_token %}

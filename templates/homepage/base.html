@@ -18,6 +18,7 @@
 		{% if user.is_authenticated %}
 		<p>You are signed in as {{ user }}</p>
 		{% else %}
+		{{ message }}
 		<form action="" method="POST">{% csrf_token %}
 			{{ form.as_p }}
 			<input type="submit" value="Sign in" />

@@ -1,0 +1,30 @@
+{% extends 'galasetter/gala_index.html' %}
+
+{% block content %}
+{% include 'galasetter/gala_navbar.html' %}
+
+<h3>Gala profile for {{ gala }}</h3>
+<h4>Event Details:</h4>
+<p>
+	Name: {{ gala.gala_name }}<br />
+	Date: {{ gala.gala_date }}<br />
+	Time: {{ gala.gala_time }}<br />
+	<a href="{% url 'galasetter:update' gala.id %}">EDIT DETAILS</a>
+</p>
+
+<h4>Meal Choices:</h4>
+<p>
+<strong>{{ meal_choice_message }}</strong><br />
+<table>
+	{% for choice in meal_choices %}
+	<tr>
+		<td><a href="{% url 'galasetter:edit_meal_choice' gala.id choice.id %}">{{ choice.choice_text }}</a></td>
+		<td>{{ choice.choice_desc }}</td>
+	</tr>
+	{% endfor %}
+</table>
+<a href="{% url 'galasetter:add_meal_choice' gala.id %}">ADD MEAL CHOICE</a>
+</p>
+
+
+{% endblock %}

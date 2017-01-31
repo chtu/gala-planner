@@ -1,0 +1,12 @@
+{% extends 'galasetter/gala_index.html' %}
+
+{% block content %}
+{% include 'galasetter/gala_navbar.html' %}
+
+<h3>Edit meal choice for {{ mealchoice.choice_text }}</h3>
+<form action="{% url 'galasetter:edit_meal_choice' gala.id mealchoice.id %}" method="POST">{% csrf_token %}
+	{{ form.as_p }}
+	<input type="submit" value="Update Meal Choice" />
+</form>
+
+{% endblock %}

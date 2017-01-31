@@ -56,6 +56,7 @@ class Gala(models.Model):
 class MealChoice(models.Model):
 	gala = models.ForeignKey(Gala, on_delete=models.CASCADE)
 	choice_text = models.CharField('meal choice', max_length=200)
+	choice_desc = models.CharField('meal description', max_length=500, null=True, blank=True)
 	num_selected = models.IntegerField('number of times selected', default=0)
 
 	def incrementChoice(self):
