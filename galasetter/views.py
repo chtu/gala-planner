@@ -11,19 +11,16 @@ from .models import Gala, MealChoice
 
 def gala_list(request):
 	if request.user.is_authenticated() and request.user.is_planner:
-		try:
-			galas = Gala.objects.all().filter(gala_date__gte=datetime.date.today()).filter(user_id=request.user)
-			galas = galas.order_by('gala_date', 'gala_time')
-			gala_message = "You have %i upcoming galas." % (len(galas))
+		future_galas = Gala.objects.all().filter(gala_date__gte=datetime.date.today()).filter(user_id=request.user)
+		future_galas = future_galas.order_by('gala_date', 'gala_time')
+		future_gala_message = "You have %i upcoming galas." % (len(future_galas))
 
-			context = {
-				'galas': galas,
-				'gala_message': gala_message,
-			}
+		context = {
+			'future_galas': future_galas,
+			'future_gala_message': future_gala_message,
+		}
 
-			return render(request, 'galasetter/gala_list.html', context)
-		except:
-			return render(request, 'homepage/error_page.html', {})
+		return render(request, 'galasetter/gala_list.html', context)
 	else:
 		return render(request, 'homepage/error_page.html', {})
 
@@ -46,7 +43,6 @@ def update(request, gala_id):
 						gala.gala_date = date
 					if time != None:
 						gala.gala_time = time
-
 					gala.save()
 
 					return HttpResponseRedirect(reverse('galasetter:details', args=(gala.id,)))

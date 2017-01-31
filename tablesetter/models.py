@@ -8,8 +8,7 @@ from galasetter.models import Gala, MealChoice
 #In class Table, our 'user' is basically a table sponsor who buys the table at the gala
 class Table(models.Model):
 	gala = models.ForeignKey(Gala, on_delete=models.CASCADE)
-	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-	table_sponsor_name = models.CharField('table sponsor', max_length=150, blank=False)
+	table_sponsor = models.OneToOneField(User, null=True)
 	table_size = models.IntegerField(blank=False, validators=[MaxValueValidator(99)])
 	date_created = models.DateTimeField(auto_now_add=True, auto_now=False, null=True)
 	date_updated = models.DateTimeField(auto_now_add=False, auto_now=True, null=True)

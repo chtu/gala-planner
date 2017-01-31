@@ -3,16 +3,16 @@
 {% block content %}
 <table>
 	<tr>
-		<td>{{ gala_message }}</td>
+		<td>{{ future_gala_message }}</td>
 	</tr>
 	<tr>
 		<td><a href="{% url 'galasetter:create' %}"><strong>Create new gala</strong></a></td>
 	</tr>
-	{% for gala in galas %}
+	{% for future_gala in future_galas %}
 	<tr>
-		<td><a href="{% url 'galasetter:details' gala.id %}">{{ gala.gala_name }}</a></td>
-		<td>{{ gala.gala_date }}</td>
-		<td>{{ gala.gala_time }}</td>
+		<td><a href="{% url 'galasetter:details' future_gala.id %}">{{ future_gala.gala_name }}</a></td>
+		<td>{{ future_gala.gala_date }}</td>
+		<td>{{ future_gala.gala_time }}</td>
 	</tr>
 	{% endfor %}
 </table>
