@@ -5,10 +5,9 @@ from accounts.models import User
 from galasetter.models import Gala, MealChoice
 
 
-#In class Table, our 'user' is basically a table sponsor who buys the table at the gala
 class Table(models.Model):
 	gala = models.ForeignKey(Gala, on_delete=models.CASCADE)
-	table_sponsor = models.OneToOneField(User, null=True)
+	table_sponsor = models.ForeignKey(User, null=True)
 	table_size = models.IntegerField(blank=False, validators=[MaxValueValidator(99)])
 	date_created = models.DateTimeField(auto_now_add=True, auto_now=False, null=True)
 	date_updated = models.DateTimeField(auto_now_add=False, auto_now=True, null=True)
@@ -20,7 +19,7 @@ class Table(models.Model):
 class Seat(models.Model):
 	table = models.ForeignKey(Table, on_delete=models.CASCADE)
 	invite_is_pending = models.BooleanField(default=False)
-	last_invite_sent_datetime = models.DateTimeField(null=True)
+	last_invite_sent = models.DateTimeField(null=True)
 	details_completed = models.BooleanField(default=True)
 	is_donated = models.BooleanField(default=False)
 

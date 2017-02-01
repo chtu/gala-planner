@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from .forms import AddMealChoiceForm, EditMealChoiceForm, GalaForm, GalaUpdateForm
 from .models import Gala, MealChoice
+from tablesetter.models import Table
 
 
 def gala_list(request):
@@ -90,15 +91,19 @@ def details(request, gala_id):
 	if request.user.is_authenticated() and request.user.is_planner:
 		try:
 			gala = Gala.objects.get(id=gala_id, user_id=request.user)
+			tables = Table.objects.all().filter(gala=gala)
 
-			meal_choices = MealChoice.objects.all().filter(gala=gala_id)
+			meal_choices = MealChoice.objects.all().filter(gala=gala)
 
 			meal_choice_message = "You have %i meal choices set." % (len(meal_choices))
+			table_message = "You have %i tables set." % (len(tables))
 
 			context = {
 				'gala': gala,
 				'meal_choice_message': meal_choice_message,
 				'meal_choices': meal_choices,
+				'tables': tables,
+				'table_message': table_message,
 			}
 
 			return render(request, 'galasetter/gala_details.html', context)

@@ -4,5 +4,5 @@ from . import views
 app_name = "tablesetter"
 
 urlpatterns = [
-	url(r'^$', views.home, name="home"),
+	url(r'^allseats', views.all_seats, name='all_seats'),
 ]
