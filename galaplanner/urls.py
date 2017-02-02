@@ -21,5 +21,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^galas/', include('galasetter.urls')),
     url(r'^signup/', include('accounts.urls')),
-    url(r'^tablesetter/', include('tablesetter.urls')),
+    url(r'^tables/', include('tablesetter.urls')),
 ]

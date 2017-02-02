@@ -4,10 +4,10 @@
 			<a href="{% url 'galasetter:details' gala.id %}">Details</a>
 		</td>
 		<td>
-			<a href="{% url 'tablesetter:all_seats' %}">Tables</a>
+			<a href="{% url 'tablesetter:all_tables' gala.id %}">Tables</a>
 		</td>
 		<td>
-			<a href="">Seats</a>
+			<a href="{% url 'tablesetter:all_seats' gala.id %}">Seats</a>
 		</td>
 	</tr>
 </table>
