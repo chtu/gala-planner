@@ -80,3 +80,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 		full_name = '%s %s' % (self.first_name, self.last_name)
 		return full_name
 
+class Invite(models.Model):
+	email = models.EmailField(null=True)
+	invite_complete = models.BooleanField(default=False)
+
+	def clean_email(self):
+		email = self.cleaned_data.get('email')
+		return email.lower()

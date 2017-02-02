@@ -2,7 +2,7 @@
 
 {% block table_content %}
 
-<p><a href="">Create New Table</a>
+<p><a href="{% url 'tablesetter:check_user' gala.id %}">Create New Table</a>
 <h3>All tables for {{ gala.gala_name }}</h3>
 
 {% endblock %}

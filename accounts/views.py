@@ -4,7 +4,12 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from accounts.forms import UserCreationForm
-from accounts.models import User
+from accounts.models import User, Invite
+from tablesetter.models import Table
+
+def create_sponsor(request, invite_sent, invite_id):
+	try:
+		invite = Invite.objects.get()
 
 
 def planner_signup_form(request):
@@ -48,3 +53,6 @@ def logout_view(request):
 	logout(request)
 
 	return HttpResponseRedirect(reverse('homepage:home'))
+
+def create_sponsor(request):
+	

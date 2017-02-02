@@ -20,6 +20,6 @@ urlpatterns = [
 	url(r'^', include('homepage.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^galas/', include('galasetter.urls')),
-    url(r'^signup/', include('accounts.urls')),
+    url(r'^accounts/', include('accounts.urls')),
     url(r'^tables/', include('tablesetter.urls')),
 ]

@@ -7,13 +7,18 @@ from galasetter.models import Gala, MealChoice
 
 class Table(models.Model):
 	gala = models.ForeignKey(Gala, on_delete=models.CASCADE)
-	table_sponsor = models.ForeignKey(User, null=True)
-	table_size = models.IntegerField(blank=False, validators=[MaxValueValidator(99)])
-	date_created = models.DateTimeField(auto_now_add=True, auto_now=False, null=True)
+	sponsor_email = models.EmailField(null=True, blank=False)
+	table_size = models.IntegerField(blank=False, null=True, validators=[MaxValueValidator(99)])
+	date_created = models.DateTimeField(null=True)
 	date_updated = models.DateTimeField(auto_now_add=False, auto_now=True, null=True)
 
 	def __str__(self):
 		return self.table_sponsor
+
+	def get_coded_date_str(self):
+		d. = self.cleaned_data.get('date_created')
+		date_str = "%i%i%i%i%i" % (d.second, d.year, d.microsecond, d.month, d.day)
+		return date_str
 
 
 class Seat(models.Model):

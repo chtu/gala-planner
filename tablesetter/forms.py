@@ -2,7 +2,7 @@ from django import forms
 
 
 class UserCheckForm(forms.Form):
-	email = forms.CharField(max_length=150, required=True)
+	email = forms.EmailField(max_length=150, required=True, widget=forms.EmailInput(attrs={'placeholder':"Sponsor's email"}))
 
 	def clean_email(self):
 		email = self.cleaned_data.get('email')
