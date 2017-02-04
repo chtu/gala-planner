@@ -1,0 +1,21 @@
+{% extends 'tablesetter/table_index.html' %}
+
+{% block table_content %}
+
+{% if not invite_form_is_valid %}
+
+<h3>Uh oh, it looks like there was an error</h3>
+<form action="{% url 'tablesetter:invite_sent' gala.id %}" method=POST>{% csrf_token %}
+	Email: {{ email }}<br/>
+	Number of tables: {{ invite_form.num_tables }} {{ invite_form.num_tables.errors.as_text }}
+	<input type="submit" value="Click here to send an invite" />
+</form>
+
+{% else %}
+
+<h3>Invitation sent to {{ email }}</h3>
+url to get there: {{ url }}
+
+{% endif %}
+
+{% endblock %}

@@ -1,8 +1,8 @@
 from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, Permission
-
 from django.contrib.auth.base_user import BaseUserManager
+
 
 class UserManager(BaseUserManager):
 	use_in_migrations = True
@@ -81,8 +81,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 		return full_name
 
 class Invite(models.Model):
-	email = models.EmailField(null=True)
-	invite_complete = models.BooleanField(default=False)
+	email = models.EmailField()
+	gala_id = models.IntegerField(null=True)
+	is_complete = models.BooleanField(default=False)
+	code = models.CharField(max_length=50, null=True)
+	num_tables = models.IntegerField(default=1)
+	date_sent = models.DateTimeField(auto_now_add=True, auto_now=False, null=True) #delete the null later
 
 	def clean_email(self):
 		email = self.cleaned_data.get('email')

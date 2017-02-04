@@ -2,7 +2,7 @@
 
 {% block table_content %}
 
-{% if sponsor %}
+{% if user_found %}
 <h3>The following user was found:</h3>
 <p>Email: {{ email }}<br />
 Name: {{ sponsor.first_name }} {{ sponsor.last_name }}</p>
@@ -12,12 +12,18 @@ Name: {{ sponsor.first_name }} {{ sponsor.last_name }}</p>
 
 <h4>If it is incorrect, please enter another email</h4>
 
-{% elif creation_form %}
+{% elif user_not_found %}
 <h4>An account under {{ email }} has not yet been created!</h4>
-<p>Please use the following form to create an account for this user.</p>
+<p>If this is the correct user, <br />
+<form action="{% url 'tablesetter:invite_sent' gala.id %}" method="POST">{% csrf_token %}
+	Email: {{ email }}<br/>
+	<!--This field is hidden-->
+	{{ invite_form.email }}
+	Number of tables: {{ invite_form.num_tables }} {{ invite_form.num_tables.errors.as_text }}<br />
+	<input type="submit" value="Click Here to Send an Invite" />
+</form>
 
-(action to send email)
-
+<h4>If that is not the email address you wanted, search in this box again</h4>
 {% else %}
 <h4>Please enter the sponsor's email</h4>
 {% endif %}
@@ -25,6 +31,5 @@ Name: {{ sponsor.first_name }} {{ sponsor.last_name }}</p>
 	{{ form.email }}<br/>
 	<input type="submit" value="Submit" />
 </form>
-
 
 {% endblock %}

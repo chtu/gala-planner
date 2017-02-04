@@ -30,8 +30,15 @@
 <strong>{{ table_message }}</strong><br />
 <table>
 	<tr>
-		<td>
+		<th>Email</th>
+		<th>Number of Seats</th>
 	</tr>
+	{% for table in tables %}
+	<tr>
+		<td>{{ table.sponsor_email }}</td>
+		<td>{{ table.table_size }}
+	</tr>
+	{% endfor %}
 </table>
 
 

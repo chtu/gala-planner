@@ -1,0 +1,8 @@
+<h2>Welcome, new user!</h2>
+<p>Please fill out the following form</p>
+
+<form action="{% url 'accounts:create_sponsor' invitation.id invitation.code %}" method='POST'>{% csrf_token %}
+	Email: {{ invitation.email }}<br/>
+	{{ form.as_p }}
+	<input type="submit" value="Create Account" />
+</form>
