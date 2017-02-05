@@ -1,7 +1,7 @@
 import datetime
 
 from django import forms
-from django.contrib.auth import logout
+from django.contrib.auth import logout, login
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -63,17 +63,28 @@ def create_sponsor(request, invite_id, invite_code):
 				form = UserCreationForm(request.POST or None)
 
 				if form.is_valid():
+					email = form.cleaned_data.get('email')
 					form.save()
 					invitation.is_complete = True
 					invitation.save()
+					user = User.objects.get(email=email)
 
-					for num in range(0, invitation.num_tables):
-						Table.objects.create(sponsor_email=invitation.email, gala=gala)
+					all_tables = Table.objects.all().filter(sponsor_email=email)
 
+					if len(all_tables) != 0:
+						for table in all_tables:
+							table.user = user
+							table.save()
 
+					login(request, user)
 
 					return HttpResponseRedirect(reverse('homepage:home'))
 				else:
+					if request.POST:
+						message = "An error occurred! Please make sure you type your password correctly in both boxes and include all necessary fields."
+					else:
+						message = "Please fill out the following information to create your account."
+
 					form = UserCreationForm(initial={
 							'email': invitation.email,
 						})
@@ -81,6 +92,7 @@ def create_sponsor(request, invite_id, invite_code):
 					context = {
 						'form': form,
 						'invitation': invitation,
+						'message': message,
 					}
 					return render(request, 'accounts/create_sponsor.html', context)
 

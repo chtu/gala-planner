@@ -7,13 +7,15 @@ from galasetter.models import Gala, MealChoice
 
 class Table(models.Model):
 	gala = models.ForeignKey(Gala, on_delete=models.CASCADE)
-	sponsor_email = models.EmailField(null=True, blank=False)
-	table_size = models.IntegerField(default=10, blank=False, null=True, validators=[MaxValueValidator(99)])
+	user = models.ForeignKey(User, null=True)
+	sponsor_email = models.EmailField(null=True, blank=True)
+	table_size = models.IntegerField(default=10, blank=False, null=True)
 	date_created = models.DateTimeField(auto_now_add=True, auto_now=False, null=True)
 	date_updated = models.DateTimeField(auto_now_add=False, auto_now=True, null=True)
 
 	def __str__(self):
 		return self.table_sponsor
+
 
 class Seat(models.Model):
 	table = models.ForeignKey(Table, on_delete=models.CASCADE)

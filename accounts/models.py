@@ -85,7 +85,7 @@ class Invite(models.Model):
 	gala_id = models.IntegerField(null=True)
 	is_complete = models.BooleanField(default=False)
 	code = models.CharField(max_length=50, null=True)
-	num_tables = models.IntegerField(default=1)
+	table_size = models.IntegerField(default=1)
 	date_sent = models.DateTimeField(auto_now_add=True, auto_now=False, null=True) #delete the null later
 
 	def clean_email(self):

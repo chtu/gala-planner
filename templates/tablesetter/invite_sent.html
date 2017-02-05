@@ -2,14 +2,14 @@
 
 {% block table_content %}
 
-{% if not invite_form_is_valid %}
+{% if sponsor %}
 
-<h3>Uh oh, it looks like there was an error</h3>
-<form action="{% url 'tablesetter:invite_sent' gala.id %}" method=POST>{% csrf_token %}
-	Email: {{ email }}<br/>
-	Number of tables: {{ invite_form.num_tables }} {{ invite_form.num_tables.errors.as_text }}
-	<input type="submit" value="Click here to send an invite" />
-</form>
+<h4>A table was created for {{ sponsor.first_name }} {{ sponsor.last_name }}</h4>
+
+{% elif invitation_pending %}
+
+<h4>A table was created under the e-mail {{ email }}</h4>
+<p>An invitation is still pending for this user.</p>
 
 {% else %}
 
@@ -17,5 +17,7 @@
 url to get there: {{ url }}
 
 {% endif %}
+
+<p><a href="{% url 'tablesetter:all_tables' gala.id %}">Click here to go back to your gala details</a></p>
 
 {% endblock %}

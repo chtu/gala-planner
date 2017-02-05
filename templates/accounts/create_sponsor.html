@@ -1,5 +1,5 @@
 <h2>Welcome, new user!</h2>
-<p>Please fill out the following form</p>
+<p>{{ message }}</p>
 
 <form action="{% url 'accounts:create_sponsor' invitation.id invitation.code %}" method='POST'>{% csrf_token %}
 	Email: {{ invitation.email }}<br/>

@@ -8,4 +8,5 @@ urlpatterns = [
 	url(r'^(?P<gala_id>[0-9]+)/alltables/', views.all_tables, name='all_tables'),
 	url(r'^create/check/(?P<gala_id>[0-9]+)/', views.check_user, name="check_user"),
 	url(r'^invite-sent/(?P<gala_id>[0-9]+)/', views.invite_sent, name="invite_sent"),
+	url(r'^set-table-size/(?P<gala_id>[0-9]+)/', views.set_table_size, name="set_table_size"),
 ]

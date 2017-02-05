@@ -1,5 +1,7 @@
 from django import forms
 
+from tablesetter.models import Table
+
 
 class UserCheckForm(forms.Form):
 	email = forms.EmailField(max_length=150, required=True, widget=forms.EmailInput(attrs={'placeholder':"Sponsor's email"}))
@@ -10,7 +12,7 @@ class UserCheckForm(forms.Form):
 
 class InviteForm(forms.Form):
 	email = forms.EmailField(required=True, widget=forms.HiddenInput())
-	num_tables = forms.IntegerField(required=True)
+	table_size = forms.IntegerField(required=True)
 
 	def clean_num_tables(self):
 		num_tables = self.cleaned_data.get('num_tables')
@@ -23,3 +25,20 @@ class InviteForm(forms.Form):
 	def clean_email(self):
 		email = self.cleaned_data.get('email')
 		return email.lower()
+
+class TableForm(forms.ModelForm):
+	class Meta:
+		model = Table
+		fields = ['table_size']
+		widgets = {
+			'table_size': forms.TextInput(attrs={'placeholder':'Number of Seats', 'required':True}),
+		}
+
+	def clean_table_size(self):
+		table_size = self.cleaned_data.get('table_size')
+		if table_size <= 0:
+			raise forms.ValidationError('The table size cannot be zero or a negative number.')
+		elif table_size > 99:
+			raise forms.ValidationError('The table size cannot be too large.')
+		else:
+			return table_size

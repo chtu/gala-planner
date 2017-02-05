@@ -1,14 +1,18 @@
 import random
 import string
 
+from django.contrib.auth import login
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 
 from accounts.forms import UserCreationForm
 from accounts.models import User, Invite
+from errors import error_handling
 from galasetter.models import Gala
-from tablesetter.forms import InviteForm, UserCheckForm
+from tablesetter.forms import InviteForm, TableForm, UserCheckForm
 from tablesetter.models import Table
 
 
@@ -16,7 +20,8 @@ def generate_random_string():
 	return ''.join(random.SystemRandom().choice(string.ascii_uppercase
 		+ string.ascii_lowercase + string.digits) for _ in range(30))
 
-# Create your views here.
+
+
 def all_seats(request, gala_id):
 	if (request.user.is_authenticated() and request.user.is_planner):
 		try:
@@ -26,23 +31,32 @@ def all_seats(request, gala_id):
 			}
 			return render(request, 'tablesetter/all_seats.html', context)
 		except ObjectDoesNotExist:
-			return render(request, 'homepage/error_page.html', {})
+			return error_handling.unauth_err(request)
 	else:
-		return render(request, 'homepage/error_page.html', {})
+		return error_handling.unauth_err(request)
+
+
 
 def all_tables(request, gala_id):
 	if (request.user.is_authenticated() and request.user.is_planner):
 		try:
 			gala = Gala.objects.get(id=gala_id, user_id=request.user)
+			tables = Table.objects.all().filter(gala=gala)
+
+			field = 'sponsor_email'
+			tables = tables.values(field).order_by(field).annotate(the_count=Count(field))
 
 			context = {
 				'gala': gala,
+				'tables': tables,
 			}
 			return render(request, 'tablesetter/all_tables.html', context)
+
 		except ObjectDoesNotExist:
-			return render(request, 'homepage/error_page.html', {})
+			return error_handling.unauth_err(request)
 	else:
-		return render(request, 'homepage/error_page.html', {})
+		return error_handling.unauth_err(request)
+
 
 def check_user(request, gala_id):
 	if request.user.is_authenticated() and request.user.is_planner:
@@ -50,107 +64,136 @@ def check_user(request, gala_id):
 			gala = Gala.objects.get(id=gala_id, user_id=request.user)
 
 			# If the email was submitted
-			if request.POST:
-				form = UserCheckForm(request.POST)
-				if form.is_valid():
-					email = form.cleaned_data.get('email')
-					# User with the email already exists
-					try:
-						sponsor = User.objects.get(email=email, is_planner=False)
-
-						form = UserCheckForm()
-						user_found = True
-
-						context = {
-							'form': form,
-							'gala': gala,
-							'email': email,
-							'sponsor': sponsor,
-							'user_found': user_found,
-						}
-					# User with email does not exist
-					except ObjectDoesNotExist:
-						form = UserCheckForm()
-						num_tables = 1
-						user_not_found = True
-						invite_form = InviteForm(initial={
-								'email': email,
-								'num_tables': num_tables,
-							})
-
-						context = {
-							'email': email,
-							'form': form,
-							'gala': gala,
-							'invite_form': invite_form,
-							'user_not_found': user_not_found,
-						}
-					return render(request, 'tablesetter/check_user.html', context)
-				else:
-					form = UserCheckForm()
-
-					context = {
-						'gala': gala,
-						'form': form,
-					}
-					return render(request, 'tablesetter/check_user.html', context)
-			# Email not submitted yet
+			form = UserCheckForm(request.POST or None)
+			if form.is_valid():
+				request.session['_user_check_post'] = request.POST
+				return HttpResponseRedirect(reverse('tablesetter:set_table_size', args=(gala.id,)))
 			else:
-				form = UserCheckForm()
-
 				context = {
 					'gala': gala,
 					'form': form,
 				}
 				return render(request, 'tablesetter/check_user.html', context)
 		except ObjectDoesNotExist:
-			return render(request, 'homepage/error_page.html', {})
+			return error_handling.unauth_err(request)
 	else:
-		return render(request, 'homepage/error_page.html', {})
+		return error_handling.unauth_err(request)
+
+
 
 
 
 def invite_sent(request, gala_id):
-	if request.user.is_authenticated() and request.user.is_planner and request.POST:
+	if request.user.is_authenticated() and request.user.is_planner:
 		try:
 			gala = Gala.objects.get(id=gala_id, user_id=request.user)
 
-			invite_form = InviteForm(request.POST)
-			email = invite_form.data.get('email')
+			user_check_post = request.session.get('_user_check_post')
+			table_post = request.session.get('_table_post')
 
-			try:
-				invitation = Invite.objects.get(email=email)
+			if (user_check_post is None) or (table_post is None):
+				err_msg = "If you'd like to create a table for a sponsor, please start from the beginning."
+				return error_handling.custom_err(request, err_msg)
 
-				if invitation.is_complete:
-					err_msg = "This user already created an account."
-				else:
-					err_msg = "An invitation was already sent to this user."
-				return render(request, 'homepage/error_page.html', {'err_msg': err_msg,})
+			user_check_form = UserCheckForm(user_check_post)
+			table_form = TableForm(table_post)
 
-			except ObjectDoesNotExist:
-				if invite_form.is_valid():
-					invite_form_is_valid = True
-					num_tables = invite_form.cleaned_data.get('num_tables')
+			# Form is guaranteed to be valid at this point
+			if user_check_form.is_valid():
+				email = user_check_form.cleaned_data.get('email')
 
-					invite_code = generate_random_string()
+			table_size = table_form.data.get('table_size')
+			invites = Invite.objects.all().filter(email=email)
 
-					invitation = Invite.objects.create(email=email, code=invite_code, num_tables=num_tables, gala_id=gala.id)
+			if len(invites) == 0:
+				invite_code = generate_random_string()
+				invitation = Invite.objects.create(email=email, table_size=table_size, gala_id=gala.id, code=invite_code)
 
-					#For testing purposes
-					host = request.META['HTTP_HOST']
+				host = request.META['HTTP_HOST']
+				url = "%s/accounts/%s/%s/" % (host, invitation.id, invite_code)
 
-					url = "%s/accounts/%s/%s/" % (host, invitation.id, invite_code)
+				context = {
+					'email': email,
+					'gala': gala,
+					'url': url,
+				}
+			elif invites[0].is_complete:
+				sponsor = User.objects.get(email=email)
+				context = {
+					'email': email,
+					'gala': gala,
+					'sponsor': sponsor,
+				}
+				error_handling.clear_sessions(request)
+				Table.objects.create(sponsor_email=email, table_size=table_size, gala=gala, user=sponsor)
+				return render(request, 'tablesetter/invite_sent.html', context)
+			else:
+				context = {
+					'email': email,
+					'gala': gala,
+					'invitation_pending': True,
+				}
+			# Clear the session and create a new table
+			error_handling.clear_sessions(request)
+			Table.objects.create(sponsor_email=email, table_size=table_size, gala=gala)
+			return render(request, 'tablesetter/invite_sent.html', context)
 
+		except ObjectDoesNotExist:
+			return error_handling.unauth_err(request)
+	else:
+		return error_handling.unauth_err(request)
+
+
+
+def set_table_size(request, gala_id):
+	if request.user.is_authenticated() and request.user.is_planner:
+		try:
+			gala = Gala.objects.get(id=gala_id, user_id=request.user)
+			user_check_post = request.session.get('_user_check_post')
+			user_check_form = UserCheckForm(user_check_post)
+
+			#I already know that the form is valid because it passthe validation tests
+			if user_check_form.is_valid():
+				email = user_check_form.cleaned_data.get('email')
+
+			sponsor = User.objects.all().filter(email=email)
+
+			table_form = TableForm(request.POST or None)
+
+			if table_form.is_valid():
+				request.session['_table_post'] = request.POST
+				return HttpResponseRedirect(reverse('tablesetter:invite_sent', args=(gala.id,)))
+			else:
+				if len(sponsor) == 0:
+					message = "It looks like a user does not exist yet."
 					context = {
 						'email': email,
 						'gala': gala,
-						'invite_form_is_valid': invite_form_is_valid,
-						'url': url,
+						'message': message,
+						'table_form': table_form,
 					}
-				return render(request, 'tablesetter/invite_sent.html', context)
+				else:
+					message = "A user already exists under the following information."
+					context = {
+						'gala': gala,
+						'message': message,
+						'sponsor': sponsor[0],
+						'table_form': table_form,
+					}
+				return error_handling.render(request, 'tablesetter/set_table_size.html', context)
+
 		except ObjectDoesNotExist:
-			return render(request, 'homepage/error_page.html', {})
+			return error_handling.unauth_err(request)
 	else:
-		return render(request, 'homepage/error_page.html', {})
+		return error_handling.unauth_err(request)
+
+
+
+
+
+
+
+
+
 
 

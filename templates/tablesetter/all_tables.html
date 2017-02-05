@@ -3,6 +3,42 @@
 {% block table_content %}
 
 <p><a href="{% url 'tablesetter:check_user' gala.id %}">Create New Table</a>
-<h3>All tables for {{ gala.gala_name }}</h3>
+<h3>Confirmed tables for {{ gala.gala_name }}</h3>
+<table>
+	<tr>
+		<th>Last Name</th>
+		<th>First Name</th>
+		<th>Email</th>
+		<th>Table Size</th>
+	</tr>
+	{% for table in tables %}
+	{% if table.user %}
+	<tr>
+		<td>{{ table.user.last_name }}</td>
+		<td>{{ table.user.first_name }}</td>
+		<td>{{ table.sponsor_email }}</td>
+		<td>{{ table.table_size }}</td>
+	</tr>
+	{% endif %}
+	{% endfor %}
+</table>
+
+<h3>Tables with pending invitations</h3>
+<table>
+	<tr>
+		<th>E-mail</th>
+		<th>Table</th>
+	</tr>
+
+	{% for table in tables %}
+
+	{% if not table.user %}
+	<tr>
+		<td>{{ table.sponsor_email }}</td>
+		<td>{{ table.the_count }}</td>
+	</tr>
+	{% endif %}
+	{% endfor %}
+</table>
 
 {% endblock %}

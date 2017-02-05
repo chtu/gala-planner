@@ -1,5 +1,6 @@
 import datetime
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -7,6 +8,7 @@ from django.utils import timezone
 
 from .forms import AddMealChoiceForm, EditMealChoiceForm, GalaForm, GalaUpdateForm
 from .models import Gala, MealChoice
+from errors import error_handling
 from tablesetter.models import Table
 
 
@@ -23,7 +25,7 @@ def gala_list(request):
 
 		return render(request, 'galasetter/gala_list.html', context)
 	else:
-		return render(request, 'homepage/error_page.html', {})
+		return error_handling.unauth_err(request)
 
 
 def update(request, gala_id):
@@ -61,9 +63,9 @@ def update(request, gala_id):
 
 			return render(request, 'galasetter/gala_update.html', context)
 		except ObjectDoesNotExist:
-			return render(request, 'homepage/error_page.html', {})
+			return error_handling.unauth_err(request)
 	else:
-		return render(request, 'homepage/error_page.html', {})
+		return error_handling.unauth_err(request)
 
 
 def create(request):
@@ -84,7 +86,7 @@ def create(request):
 		}
 		return render(request, 'galasetter/gala_create.html', context)
 	else:
-		return render(request, 'homepage/error_page.html', {})
+		return error_handling.unauth_err(request)
 
 
 def details(request, gala_id):
@@ -92,6 +94,7 @@ def details(request, gala_id):
 		try:
 			gala = Gala.objects.get(id=gala_id, user_id=request.user)
 			tables = Table.objects.all().filter(gala=gala)
+			tables = tables.values('user', 'sponsor_email').order_by('user__last_name', 'user__first_name', 'sponsor_email').annotate(count=Count('sponsor_email'))
 
 			meal_choices = MealChoice.objects.all().filter(gala=gala)
 
@@ -108,9 +111,9 @@ def details(request, gala_id):
 
 			return render(request, 'galasetter/gala_details.html', context)
 		except ObjectDoesNotExist:
-			return render(request, 'homepage/error_page.html', {})
+			return error_handling.unauth_err(request)
 	else:
-		return render(request, 'homepage/error_page.html', {})
+		return error_handling.unauth_err(request)
 
 def add_meal_choice(request, gala_id):
 	if request.user.is_authenticated() and request.user.is_planner:
@@ -137,9 +140,9 @@ def add_meal_choice(request, gala_id):
 
 			return render(request, 'galasetter/add_meal_choice.html', context)
 		except ObjectDoesNotExist:
-			return render(request, 'homepage/error_page.html', {})
+			return error_handling.unauth_err(request)
 	else:
-		return render(request, 'homepage/error_page.html', {})
+		return error_handling.unauth_err(request)
 
 
 def edit_meal_choice(request, gala_id, mealchoice_id):
@@ -175,9 +178,9 @@ def edit_meal_choice(request, gala_id, mealchoice_id):
 
 			return render(request, 'galasetter/edit_meal_choice.html', context)
 		except ObjectDoesNotExist:
-			return render(request, 'homepage/error_page.html', {})
+			return error_handling.unauth_err(request)
 	else:
-		return render(request, 'homepage/error_page.html', {})
+		return error_handling.unauth_err(request)
 
 
 
