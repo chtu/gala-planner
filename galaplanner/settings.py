@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     #my apps
     "accounts",
     "errors",
+    'sponsors',
     "tablesetter",
     "galasetter",
     "homepage",

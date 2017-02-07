@@ -1,0 +1,57 @@
+{% extends 'sponsors/sponsors_index.html' %}
+
+{% block sponsors_content %}
+
+<h3>Confirmed Sponsors</h3>
+<table>
+	<tr>
+		<th>Last Name</th>
+		<th>First Name</th>
+		<th>Email</th>
+		<th>Number of Tables</th>
+	</tr>
+	{% for table in confirmed_sponsors %}
+	<tr>
+		<td><a href="">{{ table.user__last_name }}</a></td>
+		<td><a href="">{{ table.user__first_name }}</a></td>
+		<td>{{ table.user__email }}</td>
+		<td>{{ table.count }}</td>
+	</tr>
+	{% endfor %}
+</table>
+
+<h3>Pending Sponsors with Current Invitations</h3>
+<table>
+	<tr>
+		<th>Email</th>
+		<th>Number of Tables</th>
+	</tr>
+	{% for sponsor in pending_sponsors_with_inv %}
+	<tr>
+		<td>{{ sponsor.sponsor_email }}</td>
+		<td>{{ sponsor.count }}</td>
+	</tr>
+	{% endfor %}
+</table>
+
+
+<h3>Pending Sponsors with Expired Invitations</h3>
+<table>
+	<tr>
+		<th>Email</th>
+		<th>Number of Tables</th>
+	</tr>
+	{% for sponsor in pending_sponsors_without_inv %}
+	<tr>
+		<td>{{ sponsor.sponsor_email }}</td>
+		<td>{{ sponsor.count }}</td>
+	</tr>
+	{% endfor %}
+</table>
+
+{% for user in users %}
+{{ user }}<br/>
+{% endfor %}
+
+
+{% endblock %}

@@ -8,12 +8,13 @@ from django.utils import timezone
 
 from .forms import AddMealChoiceForm, EditMealChoiceForm, GalaForm, GalaUpdateForm
 from .models import Gala, MealChoice
-from errors import error_handling
+from errors import error_handler
 from tablesetter.models import Table
 
 
+
 def gala_list(request):
-	if request.user.is_authenticated() and request.user.is_planner:
+	if error_handler.is_auth_user(request):
 		future_galas = Gala.objects.all().filter(gala_date__gte=datetime.date.today()).filter(user_id=request.user)
 		future_galas = future_galas.order_by('gala_date', 'gala_time')
 		future_gala_message = "You have %i upcoming galas." % (len(future_galas))
@@ -25,11 +26,11 @@ def gala_list(request):
 
 		return render(request, 'galasetter/gala_list.html', context)
 	else:
-		return error_handling.unauth_err(request)
+		return error_handler.unauth_err(request)
 
 
 def update(request, gala_id):
-	if request.user.is_authenticated() and request.user.is_planner:
+	if error_handler.is_auth_user(request):
 		try:
 			gala = Gala.objects.get(id=gala_id, user_id=request.user)
 
@@ -63,13 +64,13 @@ def update(request, gala_id):
 
 			return render(request, 'galasetter/gala_update.html', context)
 		except ObjectDoesNotExist:
-			return error_handling.unauth_err(request)
+			return error_handler.unauth_err(request)
 	else:
-		return error_handling.unauth_err(request)
+		return error_handler.unauth_err(request)
 
 
 def create(request):
-	if request.user.is_authenticated() and request.user.is_planner:
+	if error_handler.is_auth_user(request):
 		form = GalaForm(request.POST or None)
 
 		if form.is_valid():
@@ -86,37 +87,32 @@ def create(request):
 		}
 		return render(request, 'galasetter/gala_create.html', context)
 	else:
-		return error_handling.unauth_err(request)
+		return error_handler.unauth_err(request)
 
 
 def details(request, gala_id):
-	if request.user.is_authenticated() and request.user.is_planner:
+	if error_handler.is_auth_user(request):
 		try:
 			gala = Gala.objects.get(id=gala_id, user_id=request.user)
-			tables = Table.objects.all().filter(gala=gala)
-			tables = tables.values('user', 'sponsor_email').order_by('user__last_name', 'user__first_name', 'sponsor_email').annotate(count=Count('sponsor_email'))
 
 			meal_choices = MealChoice.objects.all().filter(gala=gala)
 
 			meal_choice_message = "You have %i meal choices set." % (len(meal_choices))
-			table_message = "You have %i tables set." % (len(tables))
 
 			context = {
 				'gala': gala,
 				'meal_choice_message': meal_choice_message,
 				'meal_choices': meal_choices,
-				'tables': tables,
-				'table_message': table_message,
 			}
 
 			return render(request, 'galasetter/gala_details.html', context)
 		except ObjectDoesNotExist:
-			return error_handling.unauth_err(request)
+			return error_handler.unauth_err(request)
 	else:
-		return error_handling.unauth_err(request)
+		return error_handler.unauth_err(request)
 
 def add_meal_choice(request, gala_id):
-	if request.user.is_authenticated() and request.user.is_planner:
+	if error_handler.is_auth_user(request):
 		try:
 			gala = Gala.objects.get(id=gala_id, user_id=request.user)
 
@@ -140,13 +136,13 @@ def add_meal_choice(request, gala_id):
 
 			return render(request, 'galasetter/add_meal_choice.html', context)
 		except ObjectDoesNotExist:
-			return error_handling.unauth_err(request)
+			return error_handler.unauth_err(request)
 	else:
-		return error_handling.unauth_err(request)
+		return error_handler.unauth_err(request)
 
 
 def edit_meal_choice(request, gala_id, mealchoice_id):
-	if request.user.is_authenticated() and request.user.is_planner:
+	if error_handler.is_auth_user(request):
 		try:
 			gala = Gala.objects.get(id=gala_id, user_id=request.user)
 			mealchoice = MealChoice.objects.get(id=mealchoice_id, gala=gala)
@@ -178,9 +174,9 @@ def edit_meal_choice(request, gala_id, mealchoice_id):
 
 			return render(request, 'galasetter/edit_meal_choice.html', context)
 		except ObjectDoesNotExist:
-			return error_handling.unauth_err(request)
+			return error_handler.unauth_err(request)
 	else:
-		return error_handling.unauth_err(request)
+		return error_handler.unauth_err(request)
 
 
 

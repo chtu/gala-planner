@@ -10,7 +10,7 @@ from django.urls import reverse
 
 from accounts.forms import UserCreationForm
 from accounts.models import User, Invite
-from errors import error_handling
+from errors import error_handler
 from galasetter.models import Gala
 from tablesetter.forms import InviteForm, TableForm, UserCheckForm
 from tablesetter.models import Table
@@ -19,6 +19,13 @@ from tablesetter.models import Table
 def generate_random_string():
 	return ''.join(random.SystemRandom().choice(string.ascii_uppercase
 		+ string.ascii_lowercase + string.digits) for _ in range(30))
+
+def generate_invite_url(request, invitation):
+	host = request.META['HTTP_HOST']
+	url = "%s/accounts/%s/%s/" % (host, invitation.id, invitation.code)
+	return url
+
+
 
 
 
@@ -31,10 +38,9 @@ def all_seats(request, gala_id):
 			}
 			return render(request, 'tablesetter/all_seats.html', context)
 		except ObjectDoesNotExist:
-			return error_handling.unauth_err(request)
+			return error_handler.unauth_err(request)
 	else:
-		return error_handling.unauth_err(request)
-
+		return error_handler.unauth_err(request)
 
 
 def all_tables(request, gala_id):
@@ -53,9 +59,9 @@ def all_tables(request, gala_id):
 			return render(request, 'tablesetter/all_tables.html', context)
 
 		except ObjectDoesNotExist:
-			return error_handling.unauth_err(request)
+			return error_handler.unauth_err(request)
 	else:
-		return error_handling.unauth_err(request)
+		return error_handler.unauth_err(request)
 
 
 def check_user(request, gala_id):
@@ -75,9 +81,9 @@ def check_user(request, gala_id):
 				}
 				return render(request, 'tablesetter/check_user.html', context)
 		except ObjectDoesNotExist:
-			return error_handling.unauth_err(request)
+			return error_handler.unauth_err(request)
 	else:
-		return error_handling.unauth_err(request)
+		return error_handler.unauth_err(request)
 
 
 
@@ -93,7 +99,7 @@ def invite_sent(request, gala_id):
 
 			if (user_check_post is None) or (table_post is None):
 				err_msg = "If you'd like to create a table for a sponsor, please start from the beginning."
-				return error_handling.custom_err(request, err_msg)
+				return error_handler.custom_err(request, err_msg)
 
 			user_check_form = UserCheckForm(user_check_post)
 			table_form = TableForm(table_post)
@@ -107,10 +113,9 @@ def invite_sent(request, gala_id):
 
 			if len(invites) == 0:
 				invite_code = generate_random_string()
-				invitation = Invite.objects.create(email=email, table_size=table_size, gala_id=gala.id, code=invite_code)
+				invitation = Invite.objects.create(email=email, table_size=table_size, code=invite_code)
 
-				host = request.META['HTTP_HOST']
-				url = "%s/accounts/%s/%s/" % (host, invitation.id, invite_code)
+				url = generate_invite_url(request, invitation)
 
 				context = {
 					'email': email,
@@ -124,24 +129,27 @@ def invite_sent(request, gala_id):
 					'gala': gala,
 					'sponsor': sponsor,
 				}
-				error_handling.clear_sessions(request)
+				error_handler.clear_sessions(request)
 				Table.objects.create(sponsor_email=email, table_size=table_size, gala=gala, user=sponsor)
 				return render(request, 'tablesetter/invite_sent.html', context)
 			else:
+				invitation = Invite.objects.get(email=email)
+				url = generate_invite_url(request, invitation)
 				context = {
 					'email': email,
 					'gala': gala,
 					'invitation_pending': True,
+					'url': url,
 				}
 			# Clear the session and create a new table
-			error_handling.clear_sessions(request)
+			error_handler.clear_sessions(request)
 			Table.objects.create(sponsor_email=email, table_size=table_size, gala=gala)
 			return render(request, 'tablesetter/invite_sent.html', context)
 
 		except ObjectDoesNotExist:
-			return error_handling.unauth_err(request)
+			return error_handler.unauth_err(request)
 	else:
-		return error_handling.unauth_err(request)
+		return error_handler.unauth_err(request)
 
 
 
@@ -180,12 +188,12 @@ def set_table_size(request, gala_id):
 						'sponsor': sponsor[0],
 						'table_form': table_form,
 					}
-				return error_handling.render(request, 'tablesetter/set_table_size.html', context)
+				return error_handler.render(request, 'tablesetter/set_table_size.html', context)
 
 		except ObjectDoesNotExist:
-			return error_handling.unauth_err(request)
+			return error_handler.unauth_err(request)
 	else:
-		return error_handling.unauth_err(request)
+		return error_handler.unauth_err(request)
 
 
 

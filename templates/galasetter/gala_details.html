@@ -26,26 +26,5 @@
 <a href="{% url 'galasetter:add_meal_choice' gala.id %}">ADD MEAL CHOICE</a>
 </p>
 
-<h4>Number of Tables Set</h4>
-<h5>Confirmed Users</h5>
-<table>
-	<tr>
-		<th>Last Name</th>
-		<th>First Name</th>
-		<th>Email</th>
-		<th>Number of Tables</th>
-	</tr>
-	{% for table in tables %}
-	{% if table.user %}
-	<tr>
-		<td>{{ table.user.last_name }}</td>
-		<td>{{ table.user.first_name }}</td>
-		<td>{{ table.sponsor_email }}</td>
-		<td>{{ table.count }}</td>
-	</tr>
-	{% endif %}
-	{% endfor %}
-</table>
-
 
 {% endblock %}

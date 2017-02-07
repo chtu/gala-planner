@@ -2,6 +2,11 @@ from django.contrib.auth import login
 from django.shortcuts import render
 
 
+def is_auth_user(request):
+	if request.user.is_authenticated() and request.user.is_planner:
+		return True
+	else:
+		return False
 
 def clear_sessions(request):
 	user = request.user

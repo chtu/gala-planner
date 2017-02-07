@@ -1,7 +1,10 @@
+import datetime
+
 from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, Permission
 from django.contrib.auth.base_user import BaseUserManager
+from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
@@ -82,7 +85,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Invite(models.Model):
 	email = models.EmailField()
-	gala_id = models.IntegerField(null=True)
 	is_complete = models.BooleanField(default=False)
 	code = models.CharField(max_length=50, null=True)
 	table_size = models.IntegerField(default=1)
@@ -91,3 +93,17 @@ class Invite(models.Model):
 	def clean_email(self):
 		email = self.cleaned_data.get('email')
 		return email.lower()
+
+	def is_expired(self):
+		if not self.is_complete:
+			invitation_period = 2
+
+			current_dt = timezone.now()
+			one_day_later = self.date_sent + datetime.timedelta(days=invitation_period)
+
+			if one_day_later < current_dt:
+				return True
+			else:
+				return False
+		else:
+			return False

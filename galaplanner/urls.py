@@ -21,5 +21,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^galas/', include('galasetter.urls')),
     url(r'^accounts/', include('accounts.urls')),
+    url(r'^sponsors/', include('sponsors.urls')),
     url(r'^tables/', include('tablesetter.urls')),
 ]

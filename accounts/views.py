@@ -8,8 +8,10 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 
+from accounts import invite_handler
 from accounts.forms import UserCreationForm
 from accounts.models import User, Invite
+from errors import error_handler
 from galasetter.models import Gala
 from tablesetter.models import Table
 
@@ -48,16 +50,11 @@ def create_sponsor(request, invite_id, invite_code):
 	if not request.user.is_authenticated():
 		try:
 			invitation = Invite.objects.get(id=invite_id, code=invite_code, is_complete=False)
-			gala = Gala.objects.get(id=invitation.gala_id)
 
-
-			one_day_later = invitation.date_sent + datetime.timedelta(days=1)
-			current_time = timezone.now()
-
-			if one_day_later < current_time:
+			if invitation.is_expired():
 				invitation.delete()
 				err_msg = "You waited too long so the invitation is no longer valid. Please contact your gala planner for another invitation."
-				return render(request, 'homepage/error_page.html', {'err_msg': err_msg,})
+				return error_handler.custom_err(request, err_msg)
 
 			else:
 				form = UserCreationForm(request.POST or None)
@@ -98,7 +95,7 @@ def create_sponsor(request, invite_id, invite_code):
 
 		except ObjectDoesNotExist:
 			err_msg = "It's possible you are trying to access an invitation that is expired. Please contact your gala planner to receive another invitation."
-			return render(request, 'homepage/error_page.html', {'err_msg': err_msg,})
+			return error_handler.custom_err(request, err_msg)
 	else:
 		err_msg = "You're already logged in! If you're trying to create a new account, please log out and try again."
-		return render(request, 'homepage/error_page.html', {'err_msg': err_msg,})
+		return error_handler.custom_err(request, err_msg)
