@@ -14,7 +14,7 @@ from tablesetter.models import Table
 
 
 def gala_list(request):
-	if error_handler.is_auth_user(request):
+	if error_handler.is_auth_planner(request):
 		future_galas = Gala.objects.all().filter(gala_date__gte=datetime.date.today()).filter(user_id=request.user)
 		future_galas = future_galas.order_by('gala_date', 'gala_time')
 		future_gala_message = "You have %i upcoming galas." % (len(future_galas))
@@ -30,7 +30,7 @@ def gala_list(request):
 
 
 def update(request, gala_id):
-	if error_handler.is_auth_user(request):
+	if error_handler.is_auth_planner(request):
 		try:
 			gala = Gala.objects.get(id=gala_id, user_id=request.user)
 
@@ -70,7 +70,7 @@ def update(request, gala_id):
 
 
 def create(request):
-	if error_handler.is_auth_user(request):
+	if error_handler.is_auth_planner(request):
 		form = GalaForm(request.POST or None)
 
 		if form.is_valid():
@@ -81,17 +81,17 @@ def create(request):
 			Gala.objects.create(gala_name=name, gala_date=date, gala_time=time, user_id=request.user)
 
 			return HttpResponseRedirect(reverse('galasetter:gala_list'))
-
-		context = {
-			'form': form,
-		}
-		return render(request, 'galasetter/gala_create.html', context)
+		else:
+			context = {
+				'form': form,
+			}
+			return render(request, 'galasetter/gala_create.html', context)
 	else:
 		return error_handler.unauth_err(request)
 
 
 def details(request, gala_id):
-	if error_handler.is_auth_user(request):
+	if error_handler.is_auth_planner(request):
 		try:
 			gala = Gala.objects.get(id=gala_id, user_id=request.user)
 
@@ -111,8 +111,9 @@ def details(request, gala_id):
 	else:
 		return error_handler.unauth_err(request)
 
+
 def add_meal_choice(request, gala_id):
-	if error_handler.is_auth_user(request):
+	if error_handler.is_auth_planner(request):
 		try:
 			gala = Gala.objects.get(id=gala_id, user_id=request.user)
 
@@ -142,7 +143,7 @@ def add_meal_choice(request, gala_id):
 
 
 def edit_meal_choice(request, gala_id, mealchoice_id):
-	if error_handler.is_auth_user(request):
+	if error_handler.is_auth_planner(request):
 		try:
 			gala = Gala.objects.get(id=gala_id, user_id=request.user)
 			mealchoice = MealChoice.objects.get(id=mealchoice_id, gala=gala)

@@ -10,6 +10,7 @@
 
 <h4>A table was created under the e-mail {{ email }}</h4>
 <p>An invitation is still pending for this user.</p>
+{% if invitation_expired %}<p>But it looks like the invitation is expired. We generated a new url for the user.</p>{% endif %}
 <p>the url is {{ url }}</p>
 
 {% else %}

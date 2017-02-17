@@ -1,0 +1,29 @@
+{% extends 'sponsors/sponsors_index.html' %}
+
+{% block sponsors_content %}
+
+<h3>Sponsor details for:</h3>
+<h4>{{ sponsor.first_name }} {{ sponsor.last_name }}</h4>
+
+{% for table in tables %}
+
+<table>
+	<tr>
+		<th>Invite Sent</th>
+	</tr>
+	{% for key, value in seats_list %}
+
+	{% if key is table.id %}
+
+	{{ value }}
+
+	{% endif %}
+
+	{% endfor %}
+
+
+</table>
+
+{% endfor %}
+
+{% endblock %}

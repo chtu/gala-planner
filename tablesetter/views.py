@@ -1,7 +1,3 @@
-import random
-import string
-
-from django.contrib.auth import login
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
 from django.http import HttpResponseRedirect
@@ -9,21 +5,13 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from accounts.forms import UserCreationForm
-from accounts.models import User, Invite
+from accounts.models import User
 from errors import error_handler
 from galasetter.models import Gala
-from tablesetter.forms import InviteForm, TableForm, UserCheckForm
+from sponsors.forms import UserCheckForm
+from sponsors.views import Invite
+from tablesetter.forms import TableForm
 from tablesetter.models import Table
-
-
-def generate_random_string():
-	return ''.join(random.SystemRandom().choice(string.ascii_uppercase
-		+ string.ascii_lowercase + string.digits) for _ in range(30))
-
-def generate_invite_url(request, invitation):
-	host = request.META['HTTP_HOST']
-	url = "%s/accounts/%s/%s/" % (host, invitation.id, invitation.code)
-	return url
 
 
 
@@ -89,70 +77,6 @@ def check_user(request, gala_id):
 
 
 
-def invite_sent(request, gala_id):
-	if request.user.is_authenticated() and request.user.is_planner:
-		try:
-			gala = Gala.objects.get(id=gala_id, user_id=request.user)
-
-			user_check_post = request.session.get('_user_check_post')
-			table_post = request.session.get('_table_post')
-
-			if (user_check_post is None) or (table_post is None):
-				err_msg = "If you'd like to create a table for a sponsor, please start from the beginning."
-				return error_handler.custom_err(request, err_msg)
-
-			user_check_form = UserCheckForm(user_check_post)
-			table_form = TableForm(table_post)
-
-			# Form is guaranteed to be valid at this point
-			if user_check_form.is_valid():
-				email = user_check_form.cleaned_data.get('email')
-
-			table_size = table_form.data.get('table_size')
-			invites = Invite.objects.all().filter(email=email)
-
-			if len(invites) == 0:
-				invite_code = generate_random_string()
-				invitation = Invite.objects.create(email=email, table_size=table_size, code=invite_code)
-
-				url = generate_invite_url(request, invitation)
-
-				context = {
-					'email': email,
-					'gala': gala,
-					'url': url,
-				}
-			elif invites[0].is_complete:
-				sponsor = User.objects.get(email=email)
-				context = {
-					'email': email,
-					'gala': gala,
-					'sponsor': sponsor,
-				}
-				error_handler.clear_sessions(request)
-				Table.objects.create(sponsor_email=email, table_size=table_size, gala=gala, user=sponsor)
-				return render(request, 'tablesetter/invite_sent.html', context)
-			else:
-				invitation = Invite.objects.get(email=email)
-				url = generate_invite_url(request, invitation)
-				context = {
-					'email': email,
-					'gala': gala,
-					'invitation_pending': True,
-					'url': url,
-				}
-			# Clear the session and create a new table
-			error_handler.clear_sessions(request)
-			Table.objects.create(sponsor_email=email, table_size=table_size, gala=gala)
-			return render(request, 'tablesetter/invite_sent.html', context)
-
-		except ObjectDoesNotExist:
-			return error_handler.unauth_err(request)
-	else:
-		return error_handler.unauth_err(request)
-
-
-
 def set_table_size(request, gala_id):
 	if request.user.is_authenticated() and request.user.is_planner:
 		try:
@@ -170,7 +94,7 @@ def set_table_size(request, gala_id):
 
 			if table_form.is_valid():
 				request.session['_table_post'] = request.POST
-				return HttpResponseRedirect(reverse('tablesetter:invite_sent', args=(gala.id,)))
+				return HttpResponseRedirect(reverse('sponsors:invite_sent', args=(gala.id,)))
 			else:
 				if len(sponsor) == 0:
 					message = "It looks like a user does not exist yet."
@@ -194,8 +118,6 @@ def set_table_size(request, gala_id):
 			return error_handler.unauth_err(request)
 	else:
 		return error_handler.unauth_err(request)
-
-
 
 
 

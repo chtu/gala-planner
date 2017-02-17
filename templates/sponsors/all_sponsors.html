@@ -12,8 +12,8 @@
 	</tr>
 	{% for table in confirmed_sponsors %}
 	<tr>
-		<td><a href="">{{ table.user__last_name }}</a></td>
-		<td><a href="">{{ table.user__first_name }}</a></td>
+		<td><a href="{% url 'sponsors:sponsor_details' gala.id table.user__id %}">{{ table.user__last_name }}</a></td>
+		<td><a href="{% url 'sponsors:sponsor_details' gala.id table.user__id %}">{{ table.user__first_name }}</a></td>
 		<td>{{ table.user__email }}</td>
 		<td>{{ table.count }}</td>
 	</tr>
@@ -28,7 +28,7 @@
 	</tr>
 	{% for sponsor in pending_sponsors_with_inv %}
 	<tr>
-		<td>{{ sponsor.sponsor_email }}</td>
+		<td><a href="">{{ sponsor.sponsor_email }}</a></td>
 		<td>{{ sponsor.count }}</td>
 	</tr>
 	{% endfor %}
@@ -43,7 +43,8 @@
 	</tr>
 	{% for sponsor in pending_sponsors_without_inv %}
 	<tr>
-		<td>{{ sponsor.sponsor_email }}</td>
+		<td><a href="{% url 'sponsors:resend_invite' gala.id sponsor.invite_id %}">Resend</a></td>
+		<td><a href="">{{ sponsor.sponsor_email }}</a></td>
 		<td>{{ sponsor.count }}</td>
 	</tr>
 	{% endfor %}

@@ -1,0 +1,10 @@
+{% extends 'sponsors/sponsors_index.html' %}
+
+{% block sponsors_content %}
+
+<h3>New invitation created for {{ invite.email }}</h3>
+<p>The url is<br/>
+{{ url }}</p>
+<p><a href="{% url 'sponsors:all_sponsors' gala.id %}">Click here to go back</a></p>
+
+{% endblock %}
